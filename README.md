@@ -171,6 +171,9 @@ co2_saved       = offset_kwh × 0.82 kg  (India grid factor)
 ## 📸 Screenshots
 
 > Landing Page · Dashboard · History Tab · Model Info
+>
+> <img width="1870" height="879" alt="image" src="https://github.com/user-attachments/assets/b2e18569-26d8-457a-9d91-e64d9ea6ed16" />
+
 <img width="1862" height="916" alt="Screenshot 2026-04-14 152121" src="https://github.com/user-attachments/assets/008b73d8-2e70-462b-b771-d82df0e01aea" />
 
 <img width="1865" height="915" alt="Screenshot 2026-04-14 152141" src="https://github.com/user-attachments/assets/90b0b2cb-7bac-419b-b9ad-5da22506c208" />
