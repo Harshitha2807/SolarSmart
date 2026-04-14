@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SolarSmart — Welcome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    background: #0a0e1a;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* ── reuse bg effects from main app ── */
+  #bg-canvas { position: fixed; inset: 0; z-index: 0; opacity: 0.18; }
+  .bg-glow   { position: fixed; border-radius: 50%; filter: blur(120px); z-index: 0; pointer-events: none; }
+  .glow1     { width: 600px; height: 600px; top: -180px; left: -160px; background: rgba(245,166,35,0.18); }
+  .glow2     { width: 500px; height: 500px; bottom: -120px; right: -100px; background: rgba(245,166,35,0.10); }
+  .scanline  { position: fixed; inset: 0; background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.012) 2px,rgba(255,255,255,0.012) 4px); pointer-events: none; z-index: 1; }
+
+  /* ── layout ── */
+  .page-wrap {
+    position: relative; z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 24px 80px;
+  }
+
+  /* ── logo / brand ── */
+  .brand {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .brand-name {
+    font-size: 42px; font-weight: 800; letter-spacing: -1px;
+    color: #fff;
+  }
+  .brand-name span { color: #F5A623; }
+
+  /* ── pill ── */
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.35);
+    color: #F5A623;
+    font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+    padding: 6px 16px; border-radius: 999px;
+    margin-bottom: 32px;
+  }
+  .pill-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #F5A623;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── tagline ── */
+  .tagline {
+    font-size: 17px; font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    text-align: center; max-width: 520px;
+    line-height: 1.7; margin-bottom: 52px;
+  }
+
+  /* ── info cards ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    width: 100%; max-width: 900px;
+    margin-bottom: 52px;
+  }
+
+  .info-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 16px;
+    padding: 26px 22px;
+    transition: border-color 0.25s, background 0.25s;
+  }
+  .info-card:hover {
+    background: rgba(245,166,35,0.07);
+    border-color: rgba(245,166,35,0.3);
+  }
+
+  .ic-icon {
+    font-size: 28px; margin-bottom: 14px;
+    display: block;
+  }
+  .ic-title {
+    font-size: 15px; font-weight: 600;
+    color: #F5A623; margin-bottom: 8px;
+  }
+  .ic-body {
+    font-size: 13.5px; font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.65;
+  }
+
+  /* ── beneficiaries strip ── */
+  .bene-section {
+    width: 100%; max-width: 900px;
+    margin-bottom: 56px;
+  }
+  .bene-title {
+    font-size: 13px; font-weight: 500; letter-spacing: 1px;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .bene-row {
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 12px;
+  }
+  .bene-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 13.5px; font-weight: 400;
+    color: rgba(255,255,255,0.7);
+  }
+  .bene-chip span { font-size: 15px; }
+
+  /* ── stats row ── */
+  .stats-strip {
+    display: flex; flex-wrap: wrap;
+    justify-content: center; gap: 32px;
+    margin-bottom: 56px;
+    width: 100%; max-width: 700px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 28px; font-weight: 700; color: #F5A623;
+    display: block; line-height: 1;
+  }
+  .stat-lbl {
+    font-size: 12px; font-weight: 400;
+    color: rgba(255,255,255,0.4);
+    margin-top: 4px; display: block;
+    letter-spacing: 0.4px;
+  }
+
+  /* ── CTA button ── */
+  .cta-btn {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: #F5A623;
+    color: #0a0e1a;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 16px; font-weight: 700;
+    padding: 16px 40px;
+    border: none; border-radius: 999px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 0 32px rgba(245,166,35,0.25);
+  }
+  .cta-btn:hover {
+    background: #ffc04d;
+    transform: translateY(-2px);
+    box-shadow: 0 0 48px rgba(245,166,35,0.4);
+  }
+  .cta-btn:active { transform: scale(0.97); }
+
+  .cta-arrow {
+    width: 20px; height: 20px;
+    background: rgba(10,14,26,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+  }
+
+  /* ── footer note ── */
+  .foot-note {
+    margin-top: 32px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+
+  @media (max-width: 520px) {
+    .brand-name { font-size: 30px; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .stats-strip { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="bg-glow glow1"></div>
+<div class="bg-glow glow2"></div>
+<div class="scanline"></div>
+
+<div class="page-wrap">
+
+  <!-- LOGO -->
+  <div class="brand">
+    <svg width="48" height="48" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="7" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+      <circle cx="16" cy="16" r="3" fill="#F5A623"/>
+      <line x1="16" y1="2"  x2="16" y2="7"  stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="16" y1="25" x2="16" y2="30" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="2"  y1="16" x2="7"  y2="16" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="25" y1="16" x2="30" y2="16" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="5.5" y1="5.5"   x2="9"    y2="9"    stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="23"  y1="23"    x2="26.5" y2="26.5" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="26.5" y1="5.5"  x2="23"   y2="9"    stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="9"   y1="23"    x2="5.5"  y2="26.5" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span class="brand-name">Solar<span>Smart</span></span>
+  </div>
+
+  <!-- PILL -->
+  <div class="pill">
+    <div class="pill-dot"></div>
+    AI-Powered Residential Solar Intelligence
+  </div>
+
+  <!-- TAGLINE -->
+  <p class="tagline">
+    Know exactly how much solar power your home can generate today — and how much money and CO₂ you'll save — powered by a real ML model trained on Vijayawada rooftop data.
+  </p>
+
+  <!-- WHAT IT DOES -->
+  <div class="cards-grid">
+    <div class="info-card">
+      <span class="ic-icon">⚡</span>
+      <div class="ic-title">Real-time power prediction</div>
+      <div class="ic-body">Input today's temperature, humidity, wind speed and solar irradiance to get an instant ML prediction of your panel's output in kW and monthly kWh generated.</div>
+    </div>
+    <div class="info-card">
+      <span class="ic-icon">💰</span>
+      <div class="ic-title">Savings &amp; bill calculator</div>
+      <div class="ic-body">See exactly how much of your electricity bill solar can offset this month, your yearly savings estimate, and your remaining APSPDCL bill — at ₹7.5/kWh tariff.</div>
+    </div>
+    <div class="info-card">
+      <span class="ic-icon">🌿</span>
+      <div class="ic-title">Carbon impact tracker</div>
+      <div class="ic-body">Every prediction shows how many kg of CO₂ your solar system avoids from the India electricity grid, expressed in easy-to-understand tree-equivalent months.</div>
+    </div>
+    <div class="info-card">
+      <span class="ic-icon">📐</span>
+      <div class="ic-title">Smart installation tips</div>
+      <div class="ic-body">Get personalised panel tilt angle recommendations, the best daily usage window for appliances, and condition-specific maintenance tips to maximise output.</div>
+    </div>
+  </div>
+
+  <!-- WHO BENEFITS -->
+  <div class="bene-section">
+    <div class="bene-title">Who benefits from SolarSmart</div>
+    <div class="bene-row">
+      <div class="bene-chip"><span>🏠</span> 1–3 BHK homeowners</div>
+      <div class="bene-chip"><span>🔌</span> Rooftop solar adopters</div>
+      <div class="bene-chip"><span>📊</span> Energy-conscious families</div>
+      <div class="bene-chip"><span>🌱</span> Eco-aware residents</div>
+      <div class="bene-chip"><span>🏗️</span> Solar installers &amp; advisors</div>
+      <div class="bene-chip"><span>📍</span> Vijayawada &amp; AP households</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-item">
+      <span class="stat-num">4,213</span>
+      <span class="stat-lbl">Real solar records trained on</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">3</span>
+      <span class="stat-lbl">Home profiles supported</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">0.82 kg</span>
+      <span class="stat-lbl">CO₂ avoided per kWh</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">₹7.5</span>
+      <span class="stat-lbl">APSPDCL tariff per kWh</span>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <a class="cta-btn" href="/app">
+    Get Started
+    <div class="cta-arrow">→</div>
+  </a>
+
+  <p class="foot-note">No login required &nbsp;·&nbsp; Runs locally on your machine &nbsp;·&nbsp; Data stored in SQLite</p>
+
+</div>
+
+<!-- reuse the animated bg canvas from app.js if available, else simple fallback -->
+<script>
+  (function () {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx    = canvas.getContext('2d');
+    let W, H, cells = [];
+
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      buildGrid();
+    }
+
+    function buildGrid() {
+      cells = [];
+      const sz = 48, cols = Math.ceil(W / sz) + 1, rows = Math.ceil(H / sz) + 1;
+      for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++)
+          cells.push({ x: c * sz, y: r * sz, s: sz, o: Math.random() * 0.4 + 0.05 });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = '#F5A623';
+      ctx.lineWidth   = 0.5;
+      cells.forEach(cell => {
+        ctx.globalAlpha = cell.o;
+        ctx.strokeRect(cell.x, cell.y, cell.s, cell.s);
+        cell.o += (Math.random() - 0.5) * 0.005;
+        cell.o  = Math.max(0.03, Math.min(0.45, cell.o));
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+    draw();
+  })();
+</script>
+
+</body>
+</html>
