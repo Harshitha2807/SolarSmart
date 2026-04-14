@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SolarSmart — Residential Solar Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+
+<!-- ░░ SOLAR PANEL BACKGROUND ░░ -->
+<canvas id="bg-canvas"></canvas>
+<div class="bg-glow glow1"></div>
+<div class="bg-glow glow2"></div>
+<div class="scanline"></div>
+
+<!-- ░░ NAVBAR ░░ -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="brand-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32">
+        <circle cx="16" cy="16" r="7" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+        <circle cx="16" cy="16" r="3" fill="#F5A623"/>
+        <line x1="16" y1="2" x2="16" y2="7" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="16" y1="25" x2="16" y2="30" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="2" y1="16" x2="7" y2="16" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="25" y1="16" x2="30" y2="16" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="5.5" y1="5.5" x2="9" y2="9" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="23" y1="23" x2="26.5" y2="26.5" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="26.5" y1="5.5" x2="23" y2="9" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="9" y1="23" x2="5.5" y2="26.5" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="brand-name">Solar<span>Smart</span></span>
+  </div>
+  <div class="nav-tabs">
+    <button class="ntab active" onclick="showTab('predict')">Predict</button>
+    <button class="ntab" onclick="showTab('history')">History</button>
+    <button class="ntab" onclick="showTab('model')">Model Info</button>
+  </div>
+</nav>
+
+<!-- ░░ HERO ░░ -->
+<section class="hero">
+  <div class="hero-pill">AI-Powered Residential Solar Intelligence</div>
+  <h1 class="hero-h1">Know Your<br/><span class="hero-glow">Solar Power</span></h1>
+  <p class="hero-p">Enter your home type and today's weather to get accurate solar generation predictions, real savings estimates, and carbon impact.</p>
+</section>
+
+<!-- ══════════════════════════════════
+     PREDICT TAB
+══════════════════════════════════ -->
+<div id="tab-predict" class="tab active">
+<div class="main-grid">
+
+  <!-- LEFT: INPUTS -->
+  <div class="panel glass-panel">
+    <div class="panel-header">
+      <span class="panel-title">System Configuration</span>
+      <span class="panel-sub">Home type &amp; weather conditions</span>
+    </div>
+
+    <!-- HOME TYPE SELECTOR -->
+    <div class="home-selector">
+      <div class="home-label">Select Home Type</div>
+      <div class="home-cards">
+        <label class="home-card" for="h1bhk">
+          <input type="radio" name="home_type" id="h1bhk" value="1bhk"/>
+          <div class="hcard-inner">
+            <div class="hcard-icon">🏠</div>
+            <div class="hcard-name">1 BHK</div>
+            <div class="hcard-detail">1 kWp · 150 units/mo</div>
+          </div>
+        </label>
+        <label class="home-card" for="h2bhk">
+          <input type="radio" name="home_type" id="h2bhk" value="2bhk" checked/>
+          <div class="hcard-inner">
+            <div class="hcard-icon">🏡</div>
+            <div class="hcard-name">2 BHK</div>
+            <div class="hcard-detail">2 kWp · 250 units/mo</div>
+          </div>
+        </label>
+        <label class="home-card" for="h3bhk">
+          <input type="radio" name="home_type" id="h3bhk" value="3bhk"/>
+          <div class="hcard-inner">
+            <div class="hcard-icon">🏘</div>
+            <div class="hcard-name">3 BHK</div>
+            <div class="hcard-detail">3 kWp · 400 units/mo</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <form id="predict-form" onsubmit="runPrediction(event)">
+      <input type="hidden" name="home_type" id="home_type_input" value="2bhk"/>
+
+      <div class="field">
+        <div class="field-top">
+          <label class="field-label">Temperature</label>
+          <span class="field-val" id="v-temp">32°C</span>
+        </div>
+        <div class="field-row">
+          <input class="num-input" type="number" id="temperature" name="temperature"
+                 value="32" min="-10" max="60" step="0.5" required
+                 oninput="syncSlider('temperature','s-temp',this.value,'°C')"/>
+          <span class="field-unit">°C</span>
+        </div>
+        <input class="aero-slider" id="s-temp" type="range" min="-10" max="60"
+               step="0.5" value="32"
+               oninput="syncNum('temperature','v-temp',this.value,'°C')"/>
+        <div class="field-range"><span>-10°C</span><span>60°C</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-top">
+          <label class="field-label">Solar Irradiance</label>
+          <span class="field-val" id="v-irr">650 W/m²</span>
+        </div>
+        <div class="field-row">
+          <input class="num-input" type="number" id="irradiance" name="irradiance"
+                 value="650" min="0" max="1200" step="10" required
+                 oninput="syncSlider('irradiance','s-irr',this.value,'W/m²')"/>
+          <span class="field-unit">W/m²</span>
+        </div>
+        <input class="aero-slider" id="s-irr" type="range" min="0" max="1200"
+               step="10" value="650"
+               oninput="syncNum('irradiance','v-irr',this.value,'W/m²')"/>
+        <div class="field-range"><span>0</span><span>1200 W/m²</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-top">
+          <label class="field-label">Humidity</label>
+          <span class="field-val" id="v-hum">65%</span>
+        </div>
+        <div class="field-row">
+          <input class="num-input" type="number" id="humidity" name="humidity"
+                 value="65" min="0" max="100" step="1" required
+                 oninput="syncSlider('humidity','s-hum',this.value,'%')"/>
+          <span class="field-unit">%</span>
+        </div>
+        <input class="aero-slider" id="s-hum" type="range" min="0" max="100"
+               step="1" value="65"
+               oninput="syncNum('humidity','v-hum',this.value,'%')"/>
+        <div class="field-range"><span>0%</span><span>100%</span></div>
+      </div>
+
+      <div class="field">
+        <div class="field-top">
+          <label class="field-label">Wind Speed</label>
+          <span class="field-val" id="v-wind">12 km/h</span>
+        </div>
+        <div class="field-row">
+          <input class="num-input" type="number" id="windspeed" name="windspeed"
+                 value="12" min="0" max="60" step="0.5" required
+                 oninput="syncSlider('windspeed','s-wind',this.value,' km/h')"/>
+          <span class="field-unit">km/h</span>
+        </div>
+        <input class="aero-slider" id="s-wind" type="range" min="0" max="60"
+               step="0.5" value="12"
+               oninput="syncNum('windspeed','v-wind',this.value,' km/h')"/>
+        <div class="field-range"><span>0</span><span>60 km/h</span></div>
+      </div>
+
+      <button class="run-btn" id="run-btn" type="submit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span id="btn-text">Analyse Solar Potential</span>
+      </button>
+    </form>
+  </div>
+
+  <!-- RIGHT: RESULTS -->
+  <div id="results-col">
+
+    <!-- Empty state -->
+    <div class="empty-state glass-panel" id="empty-state">
+      <div class="empty-sun">
+        <svg width="72" height="72" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" r="14" fill="none" stroke="#F5A623" stroke-width="1.5"/>
+          <circle cx="36" cy="36" r="6" fill="#F5A623"/>
+          <circle cx="36" cy="36" r="20" fill="#F5A623" opacity="0.06"/>
+          <circle cx="36" cy="36" r="28" fill="#F5A623" opacity="0.03"/>
+          <line x1="36" y1="4" x2="36" y2="13" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="36" y1="59" x2="36" y2="68" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="4" y1="36" x2="13" y2="36" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="59" y1="36" x2="68" y2="36" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="12" x2="18" y2="18" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="54" y1="54" x2="60" y2="60" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="60" y1="12" x2="54" y2="18" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+          <line x1="18" y1="54" x2="12" y2="60" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="empty-title">Ready to Analyse</p>
+      <p class="empty-body">Select your home type, adjust the weather parameters, and click <strong>Analyse Solar Potential</strong>.</p>
+    </div>
+
+    <!-- Results (shown after prediction) -->
+    <div id="result-cards" style="display:none">
+
+      <!-- Power hero -->
+      <div class="glass-panel hero-result">
+        <div class="hr-left">
+          <div class="hr-tag" id="r-home-label">2 BHK</div>
+          <div class="hr-label">Solar Output</div>
+          <div class="hr-big"><span id="r-kw">—</span><span class="hr-unit">kW</span></div>
+          <div class="hr-sub">
+            <span id="r-daily">—</span> kWh/day &nbsp;·&nbsp;
+            <span id="r-monthly-gen">—</span> kWh/month generated
+          </div>
+        </div>
+        <div class="hr-right">
+          <div class="eff-ring">
+            <svg width="96" height="96" viewBox="0 0 96 96">
+              <circle cx="48" cy="48" r="40" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+              <circle id="eff-arc" cx="48" cy="48" r="40" fill="none"
+                      stroke="#F5A623" stroke-width="6"
+                      stroke-linecap="round"
+                      stroke-dasharray="251.2" stroke-dashoffset="251.2"
+                      transform="rotate(-90 48 48)"
+                      style="transition:stroke-dashoffset 1s ease"/>
+            </svg>
+            <div class="eff-label"><span id="r-eff">—</span><span class="eff-pct">%</span></div>
+          </div>
+          <div class="eff-caption">Panel<br/>Efficiency</div>
+        </div>
+      </div>
+
+      <!-- Coverage bar -->
+      <div class="glass-panel coverage-card">
+        <div class="cov-header">
+          <span class="cov-title">Monthly Coverage</span>
+          <span class="cov-pct" id="r-cover">—%</span>
+        </div>
+        <div class="cov-bar-bg">
+          <div class="cov-bar-fill" id="cov-bar" style="width:0%"></div>
+        </div>
+        <div class="cov-legend">
+          <span class="cov-gen">⚡ <span id="r-gen-units">—</span> kWh solar</span>
+          <span class="cov-use">🏠 <span id="r-use-units">—</span> kWh needed</span>
+        </div>
+      </div>
+
+      <!-- Bills row -->
+      <div class="bills-row">
+        <div class="glass-panel bill-card bill-normal">
+          <div class="bill-label">Without Solar</div>
+          <div class="bill-val" id="r-normal-bill">—</div>
+          <div class="bill-sub">full monthly bill</div>
+        </div>
+        <div class="bill-arrow">→</div>
+        <div class="glass-panel bill-card bill-solar">
+          <div class="bill-label">With Solar</div>
+          <div class="bill-val green" id="r-remaining">—</div>
+          <div class="bill-sub">you pay this</div>
+        </div>
+        <div class="bill-arrow">→</div>
+        <div class="glass-panel bill-card bill-save">
+          <div class="bill-label">You Save</div>
+          <div class="bill-val gold" id="r-savings">—</div>
+          <div class="bill-sub">per month</div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">📅</div>
+          <div class="stat-val" id="r-yr-savings">—</div>
+          <div class="stat-lbl">Yearly savings</div>
+        </div>
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🌿</div>
+          <div class="stat-val" id="r-co2">—</div>
+          <div class="stat-lbl">kg CO₂ saved/mo</div>
+        </div>
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">🌳</div>
+          <div class="stat-val" id="r-trees">—</div>
+          <div class="stat-lbl">Tree-months equiv.</div>
+        </div>
+        <div class="glass-panel stat-card">
+          <div class="stat-icon">📐</div>
+          <div class="stat-val" id="r-tilt">—</div>
+          <div class="stat-lbl">Optimal tilt</div>
+        </div>
+      </div>
+
+      <!-- Reco + tip -->
+      <div class="reco-row">
+        <div class="glass-panel reco-card">
+          <div class="reco-label">Best Time to Use</div>
+          <div class="reco-val" id="r-time">—</div>
+          <div class="reco-sub" id="r-time-desc">—</div>
+        </div>
+        <div class="glass-panel tip-card">
+          <div class="tip-icon">💡</div>
+          <div class="tip-text" id="r-tip">—</div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="glass-panel chart-panel">
+        <div class="chart-hdr">Irradiance vs Estimated Output</div>
+        <div class="chart-wrap">
+          <canvas id="mini-chart"></canvas>
+        </div>
+      </div>
+
+    </div><!-- /result-cards -->
+  </div><!-- /results-col -->
+
+</div><!-- /main-grid -->
+</div><!-- /tab-predict -->
+
+
+<!-- ══════════════════════════════════
+     HISTORY TAB
+══════════════════════════════════ -->
+<div id="tab-history" class="tab">
+<div class="single-col">
+  <div class="glass-panel">
+    <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <span class="panel-title">Prediction History</span>
+        <span class="panel-sub">Last 20 predictions stored in SQLite</span>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="icon-btn" onclick="loadHistory()">↺ Refresh</button>
+        <button class="icon-btn clear-btn" onclick="clearHistory()">🗑 Clear All</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="data-table">
+        <thead><tr>
+          <th>#</th><th>Time</th><th>Home</th><th>Temp</th>
+          <th>Humidity</th><th>Wind</th><th>Irradiance</th>
+          <th>Output kW</th><th>Savings ₹/mo</th><th>CO₂ kg/mo</th>
+        </tr></thead>
+        <tbody id="hist-body">
+          <tr><td colspan="10" class="empty-cell">Click Refresh to load</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     MODEL INFO TAB
+══════════════════════════════════ -->
+<div id="tab-model" class="tab">
+<div class="model-grid">
+
+  <div class="glass-panel">
+    <div class="panel-header"><span class="panel-title">Model Performance</span></div>
+    <div id="metrics-div" style="color:rgba(255,255,255,0.4);font-size:14px;padding:12px 0">Loading…</div>
+  </div>
+
+  <div class="glass-panel">
+    <div class="panel-header"><span class="panel-title">System Architecture</span></div>
+    <div class="arch">
+      <div class="arch-box ab-blue">Frontend<small>HTML · CSS · JS · Chart.js</small></div>
+      <div class="arch-arr">→</div>
+      <div class="arch-box ab-gold">Flask API<small>Python · 4 REST routes</small></div>
+      <div class="arch-arr">→</div>
+      <div class="arch-box ab-green">ML Model<small>LinearReg · PolyReg deg 2</small></div>
+    </div>
+    <div class="arch" style="margin-top:14px">
+      <div class="arch-box ab-gray" style="margin:0 auto">SQLite Database<small>predictions.db · timestamped</small></div>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div class="panel-header"><span class="panel-title">Why These Calculations?</span></div>
+    <div class="info-text">
+      <p>The ML model predicts <strong>panel efficiency (0–1)</strong>, not raw kW. This is multiplied by your home's system capacity to give realistic output:</p>
+      <ul>
+        <li>1 BHK → 1 kWp system → max ~5 kWh/day</li>
+        <li>2 BHK → 2 kWp system → max ~10 kWh/day</li>
+        <li>3 BHK → 3 kWp system → max ~15 kWh/day</li>
+      </ul>
+      <p style="margin-top:10px">Savings = units solar covers × your entered tariff (₹/kWh). CO₂ offset = units × 0.82 kg (India grid factor).</p>
+    </div>
+  </div>
+
+  <div class="glass-panel">
+    <div class="panel-header"><span class="panel-title">Climate Impact</span></div>
+    <div class="info-text">
+      <p>For every kWh generated by solar, <strong>0.82 kg of CO₂</strong> is avoided from the India electricity grid. SolarSmart helps households:</p>
+      <ul>
+        <li>✦ Offset electricity bills with rooftop solar generation</li>
+        <li>✦ Identify ideal panel tilt angles for maximum efficiency</li>
+        <li>✦ Quantify carbon savings in tree-equivalent terms</li>
+        <li>✦ Schedule heavy appliances during peak solar windows</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="footer">
+  SolarSmart &nbsp;·&nbsp; CO₂ factor: 0.82 kg/kWh (India grid) &nbsp;·&nbsp; Trained on 4,213 real solar records
+</footer>
+
+<script src="/static/js/app.js"></script>
+
+<script>
+async function clearHistory() {
+  if (!confirm('Are you sure you want to clear all prediction history? This cannot be undone.')) return;
+  try {
+    const res  = await fetch('/clear-history', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('hist-body').innerHTML =
+        '<tr><td colspan="10" class="empty-cell">History cleared.</td></tr>';
+    } else {
+      alert('Error: ' + (data.error || 'Could not clear history.'));
+    }
+  } catch (err) {
+    alert('Request failed: ' + err.message);
+  }
+}
+</script>
+
+</body>
+</html>

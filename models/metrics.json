@@ -1,0 +1,23 @@
+{
+  "linear": {
+    "r2": 0.4096,
+    "mae": 0.2338,
+    "mse": 0.0759,
+    "rmse": 0.2756
+  },
+  "polynomial": {
+    "r2": 0.4391,
+    "mae": 0.2235,
+    "mse": 0.0722,
+    "rmse": 0.2686
+  },
+  "best_model": "polynomial",
+  "training_samples": 3370,
+  "test_samples": 843,
+  "features": [
+    "temperature2mabovegnd",
+    "relativehumidity2mabovegnd",
+    "windspeed10mabovegnd",
+    "shortwaveradiationbackwards"
+  ]
+}
